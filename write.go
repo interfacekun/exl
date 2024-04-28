@@ -20,10 +20,14 @@ import (
 
 type (
 	WriteConfigurator interface{ WriteConfigure(wc *WriteConfig) }
-	WriteConfig       struct{ SheetName, TagName string }
+	WriteConfig       struct{ 
+		StartRow int 
+		SheetName, TagName, TagTypeName string 
+		Comments map[string]string
+	}
 )
 
-var defaultWriteConfig = func() *WriteConfig { return &WriteConfig{SheetName: "Sheet1", TagName: "excel"} }
+var defaultWriteConfig = func() *WriteConfig { return &WriteConfig{SheetName: "Sheet1", TagName: "excel", TagTypeName: "type"} }
 
 func write(sheet *xlsx.Sheet, data []any) {
 	r := sheet.AddRow()
@@ -61,23 +65,50 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 	}
 	tT := new(T)
 	if sheet, _ := f.AddSheet(wc.SheetName); sheet != nil {
+		if wc.StartRow > 0 {
+			for i :=0; i < wc.StartRow; i++ {
+				startHeader := make([]any, 1)
+				startHeader[0] = "预留行, 可写一说明"
+				write(sheet, startHeader)
+			}
+		}
+
 		typ := reflect.TypeOf(tT).Elem().Elem()
 		numField := typ.NumField()
-		header := make([]any, numField, numField)
+
+		header := make([]any, numField)
+		types := make([]any, numField)
+		comments := make([]any, numField)
 		for i := 0; i < numField; i++ {
 			fe := typ.Field(i)
 			name := fe.Name
 			if tt, have := fe.Tag.Lookup(wc.TagName); have {
 				name = tt
 			}
+			if c, ok := wc.Comments[fe.Name]; ok {
+				comments[i] = c
+			} else {
+				comments[i] = ""
+			}
 			header[i] = name
+			if  tt, have := fe.Tag.Lookup(wc.TagTypeName); have {
+				name = tt
+				types[i] = name
+			}
+			
+		}
+		if wc.Comments != nil {
+			write(sheet, comments)
 		}
 		// write header
 		write(sheet, header)
+		if len(types) > 0 {
+			write(sheet, types)
+		}
 		if len(ts) > 0 {
 			// write data
 			for _, t := range ts {
-				data := make([]any, numField, numField)
+				data := make([]any, numField)
 				for i := 0; i < numField; i++ {
 					data[i] = reflect.ValueOf(t).Elem().Field(i).Interface()
 				}
