@@ -32,6 +32,13 @@ type (
 
 var defaultWriteConfig = func() *WriteConfig { return &WriteConfig{SheetName: "Sheet1", TagName: "excel", TagTypeName: "type"} }
 
+func writeDefault(sheet *xlsx.Sheet, data []any) {
+	r := sheet.AddRow()
+	for _, cell := range data {
+		r.AddCell().SetValue(cell)
+	}
+}
+
 func write(sheet *xlsx.Sheet, data []any) {
 	r := sheet.AddRow()
 	for _, cell := range data {
@@ -97,7 +104,7 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 
 				startHeader := make([]any, 1)
 				startHeader[0] = str
-				write(sheet, startHeader)
+				writeDefault(sheet, startHeader)
 			}
 		}
 
