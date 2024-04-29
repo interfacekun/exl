@@ -146,7 +146,7 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 			}
 		}
 
-		sheet.SetColWidth(0, 100, 36)
+		sheet.SetColWidth(1, 100, 36)
 	}
 }
 
