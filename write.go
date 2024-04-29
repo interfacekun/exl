@@ -21,6 +21,7 @@ import (
 type (
 	WriteConfigurator interface{ WriteConfigure(wc *WriteConfig) }
 	WriteConfig       struct{ 
+		HeadStyle *xlsx.Style
 		StartRow int 
 		SheetName, TagName, TagTypeName string 
 		Comments map[string]string
@@ -35,6 +36,18 @@ func write(sheet *xlsx.Sheet, data []any) {
 		r.AddCell().SetValue(cell)
 	}
 }
+
+func writeStyle(sheet *xlsx.Sheet, data []any, style *xlsx.Style) {
+	r := sheet.AddRow()
+	for _, cell := range data {
+		c := r.AddCell()
+		c.SetValue(cell)
+		if style != nil {
+			c.SetStyle(style)
+		}
+	}
+}
+
 
 // Write defines write []T to excel file
 //
@@ -102,9 +115,9 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 			write(sheet, comments)
 		}
 		// write header
-		write(sheet, header)
+		writeStyle(sheet, header, wc.HeadStyle)
 		if len(types) > 0 {
-			write(sheet, types)
+			writeStyle(sheet, types, wc.HeadStyle)
 		}
 		if len(ts) > 0 {
 			// write data
