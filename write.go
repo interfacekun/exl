@@ -21,6 +21,7 @@ import (
 type (
 	WriteConfigurator interface{ WriteConfigure(wc *WriteConfig) }
 	WriteConfig       struct{ 
+		SheetComments []string
 		HeadStyle *xlsx.Style
 		StartRow int 
 		SheetName, TagName, TagTypeName string 
@@ -81,8 +82,17 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 	if sheet, _ := f.AddSheet(wc.SheetName); sheet != nil {
 		if wc.StartRow > 0 {
 			for i :=0; i < wc.StartRow; i++ {
+				var str string
+				if len(wc.SheetComments) > i {
+					str = wc.SheetComments[i]
+				}
+
+				if str == "" {
+					str = "预留行, 可写一些说明"
+				}
+
 				startHeader := make([]any, 1)
-				startHeader[0] = "预留行, 可写一说明"
+				startHeader[0] = str
 				write(sheet, startHeader)
 			}
 		}
