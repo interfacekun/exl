@@ -37,6 +37,7 @@ func write(sheet *xlsx.Sheet, data []any) {
 	for _, cell := range data {
 		r.AddCell().SetValue(cell)
 	}
+	r.SetHeight(24)
 }
 
 func writeStyle(sheet *xlsx.Sheet, data []any, style *xlsx.Style) {
@@ -48,6 +49,7 @@ func writeStyle(sheet *xlsx.Sheet, data []any, style *xlsx.Style) {
 			c.SetStyle(style)
 		}
 	}
+	r.SetHeight(24)
 }
 
 
@@ -146,7 +148,7 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 			}
 		}
 
-		sheet.SetColWidth(1, 100, 36)
+		sheet.SetColWidth(1, 100, 24)
 	}
 }
 
