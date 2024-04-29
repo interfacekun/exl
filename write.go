@@ -12,7 +12,6 @@
 package exl
 
 import (
-	"fmt"
 	"io"
 	"reflect"
 
@@ -64,7 +63,7 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 	if len(ts) > 0 {
 		ts[0].WriteConfigure(wc)
 	}
-	fmt.Printf("conifg:%v\n", wc)
+	// fmt.Printf("conifg:%v\n", wc)
 	tT := new(T)
 	if sheet, _ := f.AddSheet(wc.SheetName); sheet != nil {
 		if wc.StartRow > 0 {
