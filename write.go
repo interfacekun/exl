@@ -37,7 +37,7 @@ func write(sheet *xlsx.Sheet, data []any) {
 	for _, cell := range data {
 		r.AddCell().SetValue(cell)
 	}
-	r.SetHeight(24)
+	r.SetHeight(76)
 }
 
 func writeStyle(sheet *xlsx.Sheet, data []any, style *xlsx.Style) {
@@ -49,7 +49,8 @@ func writeStyle(sheet *xlsx.Sheet, data []any, style *xlsx.Style) {
 			c.SetStyle(style)
 		}
 	}
-	r.SetHeight(52)
+	r.SetHeight(48)
+
 }
 
 
