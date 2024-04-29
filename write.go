@@ -22,6 +22,7 @@ type (
 	WriteConfigurator interface{ WriteConfigure(wc *WriteConfig) }
 	WriteConfig       struct{ 
 		SheetComments []string
+		CommentStyle *xlsx.Style
 		HeadStyle *xlsx.Style
 		StartRow int 
 		SheetName, TagName, TagTypeName string 
@@ -121,8 +122,13 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 			}
 			
 		}
+
 		if wc.Comments != nil {
-			write(sheet, comments)
+			if wc.CommentStyle != nil {
+				writeStyle(sheet, comments, wc.CommentStyle)
+			} else {
+				write(sheet, comments)
+			}
 		}
 		// write header
 		writeStyle(sheet, header, wc.HeadStyle)
