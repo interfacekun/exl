@@ -49,7 +49,7 @@ func writeStyle(sheet *xlsx.Sheet, data []any, style *xlsx.Style) {
 			c.SetStyle(style)
 		}
 	}
-	r.SetHeight(48)
+	r.SetHeight(24)
 
 }
 
