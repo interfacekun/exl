@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/tealeg/xlsx/v3"
+	"gorm.io/datatypes"
 )
 
 var ErrNegativeUInt = errors.New("negative integer provided for unsigned field")
@@ -120,6 +121,16 @@ func UnmarshalFloat(destValue reflect.Value, cell *xlsx.Cell, params *ExcelUnmar
 	return nil
 }
 
+func UnmarshalMysqlJson(destValue reflect.Value, cell *xlsx.Cell, params *ExcelUnmarshalParameters) error {
+	str := cell.String()
+	val, err := unmarshalMysqlJsonFallback(str)
+	if err != nil {
+		return errors.Join(fmt.Errorf("error parsing cell as datatypes.JSON value: %s", str), err)
+	}
+	destValue.Set(reflect.ValueOf(val))
+	return nil
+}
+
 func UnmarshalTime(destValue reflect.Value, cell *xlsx.Cell, params *ExcelUnmarshalParameters) error {
 	var val time.Time
 	if cell.IsTime() {
@@ -151,6 +162,15 @@ func unmarshalTimeFallback(value string, formats []string) (time.Time, bool) {
 		}
 	}
 	return time.Time{}, false
+}
+
+func unmarshalMysqlJsonFallback(value string) (datatypes.JSON, error) {
+	val := &datatypes.JSON{}
+	err := val.Scan(value)
+	if err != nil {
+		return datatypes.JSON{}, err
+	}
+	return *val, nil
 }
 
 func getFieldInterface(destField reflect.Value) any {

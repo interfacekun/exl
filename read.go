@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/tealeg/xlsx/v3"
+	"gorm.io/datatypes"
 )
 
 type (
@@ -188,6 +189,10 @@ func GetUnmarshalFunc(destField reflect.Value) UnmarshalExcelFunc {
 			// Then utilize TextUnmarshaler, e.g. for things like decimal.Decimal
 			if _, ok := inf.(encoding.TextUnmarshaler); ok {
 				return UnmarshalTextUnmarshaler
+			}
+
+			if destField.Type() == reflect.TypeOf(datatypes.JSON{}) {
+				return UnmarshalMysqlJson
 			}
 
 		}

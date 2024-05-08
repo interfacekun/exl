@@ -151,13 +151,9 @@ func write0[T WriteConfigurator](f *xlsx.File, ts []T) {
 			for _, t := range ts {
 				data := make([]any, numField)
 				for i := 0; i < numField; i++ {
-					fe := typ.Field(i)
-					var tn string
-					if tt, have := fe.Tag.Lookup("type"); have {
-						tn = tt
-					}
-					data[i] = reflect.ValueOf(t).Elem().Field(i).Interface()
-					if tn == "json" {
+					field := reflect.ValueOf(t).Elem().Field(i)
+					data[i] = field.Interface()
+					if field.Type() == reflect.TypeOf(datatypes.JSON{}) {
 						bs, err := data[i].(datatypes.JSON).MarshalJSON()
 						if err != nil {
 							panic("json data type marshal error")
