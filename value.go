@@ -72,7 +72,9 @@ func UnmarshalString(destValue reflect.Value, cell *xlsx.Cell, params *ExcelUnma
 	if params.TrimSpace {
 		str = strings.TrimSpace(str)
 	}
+	fmt.Println("str", str)
 	str = strings.ReplaceAll(str, "_x000D_", "\n")
+	fmt.Println("str", str)
 	destValue.SetString(str)
 	return nil
 }
